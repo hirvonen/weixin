@@ -1,7 +1,7 @@
 <?php
 define("TOKEN", "phptestjbf");
-define("AppID", "wxfad891501f5e751d");
-define("EncodingAESKey", "xIb7PhJVeqgQvWaE774mCt7uwQgifSD6v99BAVNhlEH");
+define("AppID", "wx03cccee44426ee51");
+define("EncodingAESKey", "80f8942c040ff31e6f631038b85e7763");
 
 require (dirname(__FILE__).'/'.'encrypt/wxBizMsgCrypt.php');
 require (dirname(__FILE__).'/'.'msgHandle/msgHandle.php');
@@ -47,6 +47,7 @@ class wechatCallback
      */
     public function responseMsg()
     {
+        /*
         $timestamp = $_GET['timestamp'];
         $nonce = $_GET['nonce'];
         $msg_signature = $_GET['msg_signature'];
@@ -70,6 +71,8 @@ class wechatCallback
                 }
             }
             $this->logger(" R \r\n".$postStr);
+        */
+            $postStr = $GLOBALS['HTTP_RAW_POST_DATA'];
             $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
             $RX_TYPE = trim($postObj->MsgType);
 
@@ -88,7 +91,8 @@ class wechatCallback
                     $hdl_result = '';
                     break;
             }
-            $this->logger(" R \r\n".$result);
+            $this->logger(" R \r\n".$hdl_result);
+        /*
             //加密
             if ($encrypt_type == 'aes'){
                 $encryptMsg = ''; //加密后的密文
@@ -96,9 +100,12 @@ class wechatCallback
                 $result = $encryptMsg;
                 $this->logger(" E \r\n".$result);
             }
-            echo $result;
+        */
+            echo $hdl_result;
         }
+    /*
     }
+    */
 
     //日志记录
     public function logger($log_content)
