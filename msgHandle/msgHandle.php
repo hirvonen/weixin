@@ -4,6 +4,10 @@ define("DBUSER", "root");
 define("DBPASS", "Cccc1111");
 define("DBNAME", "eyoungdb");
 
+define("REDIRECT_URI", "http://hirvonen.sinaapp.com/oauth2.php");
+define("SCOPE", "snsapi_userinfo");
+define("OAUTH2", "https://open.weixin.qq.com/connect/oauth2/authorize");
+
 class msgHandle
 {
     private $postObj;
@@ -17,13 +21,13 @@ class msgHandle
      * 构造函数
      * @param $postObj
      */
-    public function msgHandle($postObj)
+    public function __construct($postObj)
     {
         $this->postObj = $postObj;
         $this->send_fromUsername = $this->postObj->ToUserName;
         $this->send_toUsername = $this->postObj->FromUserName;
         $this->send_time = time();
-        $this->send_textTpl = $this->getTpl($this->postObj);
+        $this->send_textTpl = $this->getTemplate($this->postObj);
     }
 
     /**
@@ -70,24 +74,31 @@ class msgHandle
         $this->selectDB();
         $eventKey = trim($this->postObj->EventKey);
         switch ($eventKey) {
-            case 'myOrder'://我的订单
-                /*$sql = "SHOW TABLES FROM eyoungdb ";
+            case 'viewdb'://查看数据
+                //$sql = "SHOW TABLES FROM eyoungdb ";
+                $sql = "SELECT * FROM tbl_user ";
                 $retval = mysql_query($sql, $this->db_conn);
 
                 $strtemp = '';
                 while($row = mysql_fetch_row($retval)){
                     //echo "<tr><td>$row[0]</td></tr>";
-                    $strtemp = $strtemp."$row[0]"."\n";
+                    $strtemp = $strtemp.$row[0]." ".
+                                        $row[1]." ".
+                                        $row[2]." ".
+                                        $row[3]." ".
+                                        $row[4]." ".
+                                        $row[5]." ".
+                                        "\n";
                 }
                 //    $row = mysql_fetch_row($retval);
-                $contentStr = $strtemp;*/
-                $contentStr = "暂时无法查看订单，程序员玩儿命施工中，敬请期待。";
+                $contentStr = $strtemp;
                 break;
-            case 'myInfo'://我的信息
-                $contentStr = "暂时无法查看信息，程序员玩儿命施工中，敬请期待。";
+            case 'oauth2'://授权测试
+                $contentStr = "授权测试<br>".
+                    "<a href='https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx03cccee44426ee51&secret=80f8942c040ff31e6f631038b85e7763&code=031727092636d6725cdfc0e74a3f11fn&grant_type=authorization_code'>点击这里获得openid</a>";
                 break;
-            case 'memberCharge'://会员充值
-                $contentStr = "暂时无法充值，程序员玩儿命施工中，敬请期待。";
+            case 'registerMember'://注册用户
+                $contentStr = "注册用户";
                 break;
             default:
                 $contentStr = "哎呦出错啦！请联系我们！021-XXXXXXXX";
@@ -104,7 +115,8 @@ class msgHandle
      */
     private function receiveEvent_Subscribe()
     {
-        $contentStr = "欢迎关注Eyoung！我们将为您提供最完美的产后恢复上门美疗服务！";
+        $contentStr = "欢迎关注".
+            "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx03cccee44426ee51&redirect_uri=http://hirvonen.sinaapp.com/oauth2.php&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'>点击这里绑定</a>";
         //$resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
         $result = $this->sentText($contentStr);
         return $result;
@@ -127,7 +139,7 @@ class msgHandle
         }
     }
 
-    private function getTpl()
+    private function getTemplate()
     {
         $msgType = trim($this->postObj->MsgType);
         switch ($msgType) {
@@ -152,6 +164,14 @@ class msgHandle
                             </xml>";
                 break;
             default:
+                $replyTpl = "<xml>
+                            <ToUserName><![CDATA[%s]]></ToUserName>
+                            <FromUserName><![CDATA[%s]]></FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType><![CDATA[%s]]></MsgType>
+                            <Content><![CDATA[%s]]></Content>
+                            <FuncFlag>0</FuncFlag>
+                            </xml>";
                 break;
         }
         return $replyTpl;
