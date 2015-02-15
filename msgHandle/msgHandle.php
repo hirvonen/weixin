@@ -6,7 +6,7 @@ define("DBNAME", "eyoungdb");
 
 define("REDIRECT_URI", "http://hirvonen.sinaapp.com/oauth2.php");
 define("SCOPE", "snsapi_userinfo");
-define("OAUTH2", "https://open.weixin.qq.com/connect/oauth2/authorize");
+define("OAUTH2_URL", "https://open.weixin.qq.com/connect/oauth2/authorize?");
 
 class msgHandle
 {
@@ -94,7 +94,7 @@ class msgHandle
                 $contentStr = $strtemp;
                 break;
             case 'oauth2'://授权测试
-                $contentStr = "授权测试<br>".
+                $contentStr = "授权测试".
                     "<a href='https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx03cccee44426ee51&secret=80f8942c040ff31e6f631038b85e7763&code=031727092636d6725cdfc0e74a3f11fn&grant_type=authorization_code'>点击这里获得openid</a>";
                 break;
             case 'registerMember'://注册用户
@@ -115,9 +115,17 @@ class msgHandle
      */
     private function receiveEvent_Subscribe()
     {
-        $contentStr = "欢迎关注".
-            "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx03cccee44426ee51&redirect_uri=http://hirvonen.sinaapp.com/oauth2.php&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'>点击这里绑定</a>";
+        $contentStr = "欢迎关注我们".
+            "<a href='".OAUTH2_URL.
+            "appid=".AppID.
+            "&redirect_uri=".REDIRECT_URI.
+            "&response_type="."code".
+            "&scope=".SCOPE.
+            "&state="."1".
+            "#wechat_redirect'>点击这里绑定</a>";
         //$resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+        //$contentStr = "欢迎关注".
+        //        "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx03cccee44426ee51&redirect_uri=http://www.eyoungbeauty.com/e-young&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'>点击这里绑定</a>";
         $result = $this->sentText($contentStr);
         return $result;
     }
